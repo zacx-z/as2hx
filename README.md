@@ -34,4 +34,4 @@ The output code will be placed in the folder "hxOutput/".
 If a directory is specified, all AS files under the directory will be processed recursively.
 
 #Note
-You can find previous version here (http://https://github.com/ladace/NerdLab/tree/master/libraries/as2hx).
+You can find previous version here (https://github.com/ladace/NerdLab/tree/master/libraries/as2hx).
