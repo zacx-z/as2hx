@@ -12,7 +12,7 @@ To convert AS3 into Haxe completely, the next phase is adding semantic analysis 
 <li>Expand the "import xxx.*;" declaration automatically.  However, some import may be missed, and should be added manually.</li>
 </ul>
 
-#Notice
+#Note
 
 <ul>
 <li>The input AS3 code is required to have ';' following each statement.  If not, the transformation will fail. </li>
@@ -33,5 +33,5 @@ as2hx [file|directory]
 The output code will be placed in the folder "hxOutput/".
 If a directory is specified, all AS files under the directory will be processed recursively.
 
-#Note
+#P.S.
 You can find previous version here (https://github.com/ladace/NerdLab/tree/master/libraries/as2hx).
