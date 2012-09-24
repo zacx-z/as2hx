@@ -1,0 +1,70 @@
+define expression
+        [arithExp]
+    |   [compExp]
+    |   [expression] [logicop] [compExp]
+    |   [questionExp]
+    |   [expression] 'is [id]
+    |   [expression] 'as [id]
+end define
+
+define compExp
+        [arithExp] [compop] [arithExp]
+    |   [arithExp]
+end define
+
+define arithExp
+        [term]
+    |   [arithExp] [addop] [term]
+end define
+
+define term
+        [primary]
+    |   [term] [mulop] [primary]
+    |   '! [term]
+    |   [term] [selfaddop]
+    |   [selfaddop] [term]
+end define
+
+define questionExp
+    [expression] '? [expression] ': [expression]
+end define
+
+define addop
+        '+
+    |   '-
+end define
+
+define mulop
+        '*
+    |   '/
+    |   '%
+end define
+
+define compop
+        '==
+    |   '!=
+    |   '>=
+    |   '<=
+    |   '<
+    |   '>
+end define
+
+define evalop
+        '=
+    |   '+=
+    |   '-=
+    |   '*=
+    |   '/=
+end define
+
+define logicop
+        '||
+    |   '&&
+    |   '&
+    |   '|
+end define
+
+define selfaddop
+        '++
+    |   '--
+end define

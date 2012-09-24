@@ -1,0 +1,324 @@
+define program
+        [packageDefinition]
+    |   [classDefinitionWithImport]
+end define
+
+keys
+    import package
+    var const try catch 
+    interface class function static extends override implements
+    public protected private
+    if else while for get set
+    null break return case default
+    % which are not keywords in haxe
+    % is as
+end keys
+
+compounds
+    == != >= <=
+    += -= *= /=
+    || && ++ --
+    ...
+end compounds
+
+comments
+    //
+    /* */
+end comments
+
+tokens
+    hexnumber "0[Xx][\dABCDEFabcdef]+"
+end tokens
+
+include "expression.grm"
+
+define packageDefinition
+    'package [id?] '{ [NL]
+        [IN] [classDefinitionWithImport] [EX]
+    '} [NL]
+end define
+
+define classDefinitionWithImport
+    [importDeclaration*]
+    [metadata*]
+    [classDefinition*]
+end define
+
+% Import Declaration
+
+define importDeclaration
+    'import [id] [dotLibField*] [dotStar?] '; [NL]
+end define
+
+define dotLibField
+    '. [id]
+end define
+
+define dotStar
+    '. '*
+end define
+
+% Class Definition
+
+define classDefinition
+    [classHeader] [classBody]
+end define
+
+define classBody
+    '{ [NL]
+        [IN] [memberDefinition*] [EX]
+    '} [NL]
+end define
+
+
+define classHeader
+    [modifier?] [classInterface] [id] [classDerivation?] [interfaceImplementation?]
+end define
+
+define classDerivation
+    'extends [type]
+end define
+
+define interfaceImplementation
+    'implements [id]
+end define
+
+define classInterface
+        'class
+    |   'interface
+end define
+
+define memberDefinition
+        [memberFuncDefinition]
+    |   [memberVarDefinition]
+end define
+
+define memberFuncDefinition
+    [memberFuncHeader] [memberFuncBody]
+end define
+
+define memberFuncBody
+    '{ [NL]
+        [IN] [statement*] [EX]
+    '} [NL] [NL]
+    | ';
+end define
+    
+define memberFuncHeader
+    [metadata?] [overrideModifier?] [modifiers?] 'function [getterSetter?] [id] ([formalList]) [typeDeclaration?]
+end define
+
+define memberVarDefinition
+    [metadata?] [modifiers?] [varConst] [id] [typeDeclaration?] [evaluation?] '; [NL]
+end define
+
+define varConst
+        'var
+    |   'const
+end define
+
+define modifiers
+        [staticModifier?] [modifier]
+    |   [modifier] [staticModifier]
+end define
+
+define modifier
+        'public
+    |   'protected
+    |   'private
+end define
+
+define staticModifier
+    'static
+end define
+
+define overrideModifier
+    'override
+end define
+
+define getterSetter
+        'get
+    |   'set
+end define
+define typeDeclaration
+    ': [type] 
+end define
+
+define type
+        [id] [dotLibField*]
+    |   [id] [dotLibField*] '< [type] '>
+    |   [id] [dotLibField*] '. '< [type] '>
+end define
+
+define formal
+    [id] [typeDeclaration?] [evaluation?]
+end define
+
+define formalList
+        [formal,]
+    |   '... [id]
+end define
+
+% Statement
+
+define statement
+        [primaryStatement?] '; [NL]
+    |   [ifStatement]
+    |   [forStatement]
+    |   [whileStatement]
+    |   [switchStatement]
+    |   [funcDefinition]
+    |   { [NL] [IN] [statement*] [EX] } [NL]
+    |   [tryBlock]
+end define
+
+define primaryStatement
+        [varDefinition]
+    |   [assignStatement]
+    |   [funcCall]
+    |   [newInstance]
+    |   [returnStatement]
+    |   'break
+end define
+
+define varDefinition
+    [varConst] [varDefElem,]
+end define
+
+define varDefElem
+    [id] [typeDeclaration?] [evaluation?]
+end define
+
+define assignStatement
+        [leftValue] [assignment*]
+    |   [leftValue] [selfaddop]
+    |   [selfaddop] [leftValue]
+end define
+
+define assignment
+    [evalop] [expression]
+end define
+
+define leftValue
+    [primary]
+end define
+
+define evaluation
+    '= [expression]
+end define
+
+define funcCall
+    [objectValue] [arguments]
+end define
+
+define funcDefinition
+    'function [id?] ([formalList]) [typeDeclaration?] '{ [NL]
+        [IN] [statement*] [EX]
+    '} [NL]
+end define
+
+define primary
+        [number]
+    |   '- [primary]
+    |   [hexnumber]
+    |   [stringlit]
+    |   [objectValue]
+    |   'null
+end define
+
+define objectValue
+        [id]
+    |   [funcCall]
+    |   [newInstance]
+    |   [objectValue] '. [id]
+    |   [arraylit]
+    |   [hashlit]
+    |   [type]
+    |   [objectValue]'[ [expression] ']
+    |   ( [expression] )
+    |   [funcDefinition]
+end define
+
+define newInstance
+    'new [type] [arguments?]
+end define
+
+define arguments
+    '( [expression,] ')
+end define
+
+define arraylit
+    '[ [expression,] ']
+end define
+
+define hashlit
+    '{ [hashItem,] '}
+end define
+
+define hashItem
+        [stringlit] ': [expression]
+    |   [id] ': [expression]
+end define
+
+% some statement
+define ifStatement
+        'if ([expression]) '{ [NL]
+            [IN] [statement*] [EX]
+        '} [NL]
+         [elseStatement?]
+    |   'if ([expression]) [statement]
+        [elseStatement?]
+end define
+
+define elseStatement
+    'else [statement]
+end define
+
+define returnStatement
+    'return [expression?]
+end define
+
+define forStatement
+        'for ([primaryStatement] '; [expression] '; [primaryStatement] ) [NL]
+            [IN] [statement] [EX]
+    |   'for 'each (['var?] [id] [typeDeclaration?] 'in [expression])
+            [IN] [statement] [EX]
+end define
+
+define whileStatement
+    'while ([expression]) [NL]
+        [IN] [statement] [EX]
+end define
+
+define switchStatement
+    'switch ([expression]) '{ [NL]
+        [IN] [caseBlock*] [EX]
+    '} [NL]
+end define
+
+define caseBlock
+    'case [primary] ':[NL] [statement*]
+    | 'default ': [NL] [statement*]
+end define
+
+define tryBlock
+    'try '{ [NL]
+        [IN] [statement*] [EX]
+    '} [catchBlock*]
+end define
+
+define catchBlock
+    'catch ([id] [typeDeclaration?]) '{ [NL]
+        [IN] [statement*] [EX]
+    '} [NL]
+end define
+
+% Metadata
+
+define metadata
+    '[ [id] ([metaField,])']
+end define
+
+define metaField
+    [id] '= [stringlit]
+end define
