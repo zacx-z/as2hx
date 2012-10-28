@@ -80,7 +80,7 @@ define classDerivation
 end define
 
 define interfaceImplementation
-    'implements [id]
+    'implements [id,]
 end define
 
 define classInterface

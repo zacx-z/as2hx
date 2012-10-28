@@ -6,8 +6,8 @@ rule main
     construct newC [program]
         C [replaceId 'Number 'Float] [replaceId 'void 'Void] [replaceId 'int 'Int] [replaceId 'uint 'UInt] [replaceId 'Function 'Dynamic] [replaceId 'Class 'Dynamic] [replaceId 'Boolean 'Bool] [replaceId 'Object 'Dynamic]
         [replaceConst] [replaceProtected] [replaceVector] [fixArray]
-        [replacePackageDefinition] [replacePackageDefinition2] [removeClassModifier] [removeOverriderModifier] [replaceForLoop1]
-        [classConstructorReplace] [castFix] [castAsFix] [reflectNewInstanceFix] [reflectNewInstanceFixWithoutArgs] [addConstructorSuper] [moveMemberVarInit] [isInstanceFix] [newFix]
+        [replacePackageDefinition] [replacePackageDefinition2] [removeClassModifier] [removeOverriderModifier] [replaceForLoop1] [replaceForLoop2]
+        [classConstructorReplace] [castFix] [castAsFix] [reflectNewInstanceFix] [reflectNewInstanceFixWithoutArgs] [addConstructorSuper] [moveMemberVarInit] [isInstanceFix] [newFix] [classHeaderFix1] [classHeaderFix2]
         [replaceSetter] [replaceGetter] [replaceEmbed]
         [generateClassDefFile] [generateTypeUsedFile] [generateImportStarLines]
     where not
@@ -316,6 +316,15 @@ rule replaceForLoop1
             S
 end rule
 
+rule replaceForLoop2
+    replace [forStatement]
+        'for 'each (V ['var?] IDX [id] T [typeDeclaration?] 'in EXP [expression])
+            S [statement]
+    by
+        'for (IDX 'in EXP)
+            S
+end rule
+
 rule replaceVector
     replace [type]
         'Vector '. '< T [type] '>
@@ -328,4 +337,33 @@ rule fixArray
         'Array
     by
         Array '< Dynamic '>
+end rule
+
+rule classHeaderFix1
+    replace $ [classHeader]
+        M [modifier?] CI [classInterface] NAME [id] BASE [classDerivation] II [interfaceImplementation]
+    deconstruct * [key] II
+        'implements
+    by 
+        M CI NAME BASE, II [expandInterfaceImpl]
+end rule
+
+rule classHeaderFix2
+    replace $ [classHeader]
+        M [modifier?] CI [classInterface] NAME [id] II [interfaceImplementation]
+    deconstruct * [key] II
+        'implements
+    by 
+        M CI NAME II [expandInterfaceImpl]
+end rule
+
+rule expandInterfaceImpl
+    replace [interfaceImplementation]
+        implements I [id,]
+    deconstruct I
+        IA [id]', REST [id,]
+    deconstruct * [id] REST
+        _ [id]
+    by
+        implements IA, implements REST
 end rule

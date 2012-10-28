@@ -25,4 +25,11 @@ redefine forStatement
         ...
     |   for ([id] 'in [expression] '... [expression]) [NL]
             [IN] [statement] [EX]
+    |   for ([id] 'in [expression]) [NL]
+            [IN] [statement] [EX]
+end redefine
+
+redefine interfaceImplementation
+        ...
+    |   [interfaceImplementation,]
 end redefine
